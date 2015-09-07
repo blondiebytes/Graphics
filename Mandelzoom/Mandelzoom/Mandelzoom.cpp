@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include <cstdlib>
 #include <GL/glut.h>
 #include <cfloat>
@@ -10,6 +11,7 @@ using namespace std;
 #define INITIAL_WIN_X 150
 #define INITIAL_WIN_Y 50
 
+
 // void methodName(Params)
 
 // How to Draw Points:
@@ -20,7 +22,6 @@ using namespace std;
 //  glEnd();
 // glFlush(); --> remember at the end
 
-
 void reshape(int w, int h)
 // Callback for processing reshape events.
 {
@@ -30,16 +31,29 @@ void reshape(int w, int h)
 	gluOrtho2D(0.0, w, 0.0, h);
 }
 
-
 void escExit(GLubyte key, int, int)
 // Callback for processing keyboard events.
 {
 	if (key == 27 /* ESC */) std::exit(0);
 }
 
+// SAMPLE MAIN: Learning C++
+int main(){
+	int apples; 
+	apples = 5;
 
-int main()
-{
+	cout << "There are " << apples << " apples." << endl;
+
+	apples = apples - 1;
+
+	cout << "If I take one away, there will be " << apples << " apples." << endl;
+	
+	// Printing Hello World
+	std::cout << "Hello World" << std::endl;
+
+	// retains screen
+	std::cin.get();
+
 	// Mask floating point exceptions.
 	_control87(MCW_EM, MCW_EM);
 
@@ -72,6 +86,5 @@ int main()
 
 	// Start the GLUT main loop.
 	glutMainLoop();
-
 
 }
