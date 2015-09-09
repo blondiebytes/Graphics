@@ -1,13 +1,57 @@
-﻿Build started 9/7/2015 4:50:22 PM.
-     1>Project "C:\Users\Physics\Desktop\kahodge-Graphics\Graphics\Graphics\Mandelzoom\Mandelzoom\Mandelzoom.vcxproj" on node 2 (Build target(s)).
+﻿Build started 9/7/2015 11:13:12 PM.
+     1>Project "C:\Users\Physics\Desktop\Graphics-master\Mandelzoom\Mandelzoom\Mandelzoom.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Mandelzoom.cpp
          Mandelzoom.cpp
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Physics\Desktop\kahodge-Graphics\Graphics\Graphics\Mandelzoom\Mandelzoom\Debug\Mandelzoom.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\Physics\Desktop\kahodge-Graphics\Graphics\Graphics\Mandelzoom\Mandelzoom\Debug\Mandelzoom.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Physics\Desktop\kahodge-Graphics\Graphics\Graphics\Mandelzoom\Mandelzoom\Debug\Mandelzoom.lib" /MACHINE:X86 Debug\Mandelzoom.obj
-         Mandelzoom.vcxproj -> C:\Users\Physics\Desktop\kahodge-Graphics\Graphics\Graphics\Mandelzoom\Mandelzoom\Debug\Mandelzoom.exe
-     1>Done Building Project "C:\Users\Physics\Desktop\kahodge-Graphics\Graphics\Graphics\Mandelzoom\Mandelzoom\Mandelzoom.vcxproj" (Build target(s)).
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(11): warning C4005: 'double': macro redefinition
+         c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(9): note: see previous definition of 'double'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(12): warning C4005: 'double': macro redefinition
+         c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(11): note: see previous definition of 'double'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(13): warning C4005: 'double': macro redefinition
+         c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(12): note: see previous definition of 'double'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(14): warning C4005: 'double': macro redefinition
+         c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(13): note: see previous definition of 'double'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(15): warning C4005: 'double': macro redefinition
+         c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(14): note: see previous definition of 'double'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(16): warning C4005: 'double': macro redefinition
+         c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(15): note: see previous definition of 'double'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(17): warning C4005: 'double': macro redefinition
+         c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(16): note: see previous definition of 'double'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(22): error C2065: 'win_h': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(24): error C2065: 'win_w': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(27): error C2065: 'zoom': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(27): error C2065: 'sReal': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(27): error C2065: 'min_x': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(27): error C2065: 'max_x': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(27): error C2065: 'win_w': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(28): error C2065: 'zoom': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(28): error C2065: 'sImaginary': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(28): error C2065: 'min_y': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(28): error C2065: 'max_y': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(28): error C2065: 'win_h': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(28): error C2059: syntax error: ')'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(32): error C2065: 'sReal': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(32): error C2065: 'sImaginary': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(32): error C2065: 'MAX': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(37): error C2065: 'zoom': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(37): error C2065: 'nSReal': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(37): error C2065: 'sReal': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(37): error C2065: 'sImaginary': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(42): error C2065: 'sImaginary': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(42): error C2065: 'sReal': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(43): error C2065: 'sReal': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(43): error C2065: 'nSReal': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(47): error C2065: 'MAX': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(107): error C2065: 'win_w': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(107): error C2065: 'win_h': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(108): error C2065: 'min_x': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(108): error C2065: 'min_y': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(114): error C2065: 'zoom': undeclared identifier
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(114): error C2143: syntax error: missing ')' before ';'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(114): error C2059: syntax error: ';'
+     1>c:\users\physics\desktop\graphics-master\mandelzoom\mandelzoom\mandelzoom.cpp(114): error C2059: syntax error: ')'
+     1>Done Building Project "C:\Users\Physics\Desktop\Graphics-master\Mandelzoom\Mandelzoom\Mandelzoom.vcxproj" (Build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:00.74
+Time Elapsed 00:00:00.37
