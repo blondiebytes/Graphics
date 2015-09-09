@@ -12,17 +12,19 @@
 
 using namespace std;
 
-#define int MAX = 1000;
+#define MAX 1000
+#define INITIAL_WIN_X 150
+#define INITIAL_WIN_Y 50
 
 // window
-#define double win_w = 400;
-#define double win_h = 400;
+double win_w = 400.0;
+double win_h = 400.0;
 
 // x & y for mandelbrot set
-#define double x2 = 0.5;
-#define double x1 = -2.0;
-#define double y2 = 1.25;
-#define double y1 = -1.25;
+double x_2 = 0.5;
+double x_1 = -2.0;
+double y_2 = 1.25;
+double y_1 = -1.25;
 
 // for rubberbanding
 int xAnchor, yAnchor, xStretch, yStretch;
@@ -32,44 +34,10 @@ bool rubberBanding = false;
 vector<Mandelbrot> vecStack;
 int index = 0;
 
-void drawMandelbrotSet() {
-	// Looping through every pixel on the screen
-	// Horizontal Plane
-	for (int u = 0; u < win_h; u++) {
-		// Vertical Plane
-		for (int v = 0; v < win_w; v++) {
-			// Calculate s's initial real and imaginary value
-			// s = sReal + (sImaginary)i
-			double sReal = x1 + u * ((x2 - x1) / (win_w - 1));
-			double sImaginary = y1 + v * ((y2 - y1) / win_h - 1));
-			// Set iteration at 0 first
-			int i = 0;
-			// while the size of z is less than 2 and we aren't add the max iterations
-			while (sReal ^ 2 + sImaginary ^ 2 <= 2 && i < MAX) {
-				// (Real) z^2 = (x^2 - y^2)
-				// z^2 = (sReal^2 - sImaginary^2)
-				// z(s)_i = (z(s)_(i-1))^2 + x
-				// z(s)_i = (z(s)_(i-1))^2 + sReal
-				double nSReal = (sReal ^ 2 - sImaginary ^ 2) + sReal;
-				// (Imaginary) z^2 = (2xy)i
-				// z^2 = (2 * sReal * sImaginary)
-				// z(s)_i = (z(s)_(i-1))^2 + y
-				// z(s)_i = (z(s)_(i-1))^2 + sImaginary
-				sImaginary = 2 * sReal*sImaginary + sImaginary;
-				sReal = nSReal;
-				i++;
-			}
-			drawPixel(u, v, i);
-			glFlush();
-
-		}
-	}
-	
-}
 
 // DRAW PIXEL:
 
-void drawPixel (int u, int v, int i) {
+void drawPixel(int u, int v, int i) {
 	// Go Find the Color --> Colors a point depending on how close (or even if it is)
 	// it is to being in the Mandelbrot set. 
 	float r;
@@ -88,40 +56,93 @@ void drawPixel (int u, int v, int i) {
 		g = 1.0;
 		b = 0.0;
 	}
-	else if (i < 350 && i < 550) {
+	else if (i < 350 && i < 450) {
 		//blue;
 		r = 0.0;
 		g = 0.0;
 		b = 1.0;
 	}
-	else if (i < 550 && i < MAX) {
+	else if (i < 450 && i < MAX) {
 		//pink
 		r = 0.9;
 		g = 0.9;
 		b = 0.9;
 	}
 	else if (i == MAX) {
-		//white;
-		r = 1.0;
-		g = 1.0;
-		b = 1.0;
-	}
-	else {
 		//black;
 		r = 0.0;
 		g = 0.0;
 		b = 0.0;
 	}
+	else {
+		//white;
+		r = 1.0;
+		g = 1.0;
+		b = 1.0;
+	}
 
 	// Set the Color -->
 	glColor3f(r, g, b);
-
-	// Plot the Point -->
-	glBegin(GL_POINTS);
+	// Plot point
 	glVertex2i(u, v);
-	glEnd();
-
+	
 }
+
+// // Calculate s's initial real and imaginary value
+// s = sReal + (sImaginary)i
+double getSReal(int u) {
+	return x_1 + u * ((x_2 - x_1) / (win_w - 1.0));
+}
+
+double getSImaginary(int v) {
+	return y_1 + v * ((y_2 - y_1) / (win_h - 1.0));
+}
+
+// Is a given complex number (point) in the mandelbrot set?
+int isInMandelbrotSet(int u, int v) {
+	// get sReal and sImaginary values
+	double sReal = getSReal(u);
+	double sImaginary = getSImaginary(v);
+	double sRealCurrent = 0;
+	double sImaginaryCurrent = 0;
+	// Set iteration at 0 first
+	int i = 0;
+	// while the size of z is less than 2 and we aren't at the max iterations
+	while (((sRealCurrent * sRealCurrent) + (sImaginaryCurrent*sImaginaryCurrent)) <= 4 && i < MAX) {
+		// (Real) z^2 = (x^2 - y^2)
+		// z^2 = (sReal^2 - sImaginary^2)
+		// z(s)_i = (z(s)_(i-1))^2 + x
+		// z(s)_i = (z(s)_(i-1))^2 + sReal
+		double nSRealCurrent = ((sRealCurrent * sRealCurrent) - (sImaginaryCurrent * sImaginaryCurrent)) + sReal;
+		// (Imaginary) z^2 = (2xy)i
+		// z^2 = (2 * sReal * sImaginary)
+		// z(s)_i = (z(s)_(i-1))^2 + y
+		// z(s)_i = (z(s)_(i-1))^2 + sImaginary
+		sImaginaryCurrent = 2 * sRealCurrent*sImaginaryCurrent + sImaginary;
+		sRealCurrent = nSRealCurrent;
+		i++;
+	}
+	return i;
+}
+
+// drawing the MandelbrotSet
+void drawMandelbrotSet() {
+	// Looping through every pixel on the screen
+	// Horizontal Plane
+	glBegin(GL_POINTS);
+	for (int u = 0; u < win_h; u++) {
+		// Vertical Plane
+		for (int v = 0; v < win_w; v++) {
+			// returns iteration number
+			int i = isInMandelbrotSet(u, v);
+			// draws pixel
+			drawPixel(u, v, i);
+		}
+	}
+	glEnd();
+	glFlush();
+}
+
 
 
 // drawing the rubber band
@@ -167,8 +188,8 @@ void Push() {
 	//else {
 		// index at 0
 		// pushing it onto the stack
-		Mandelbrot mandel(x1, x2, y1, y2);
-		vecStack.push_back(mandel);
+		Mandelbrot mandy(x_1, x_2, y_1, y_2);
+		vecStack.push_back(mandy);
 		index++;
 //	} 
 	glutPostRedisplay();
@@ -180,10 +201,10 @@ void Pop() {
 	if (index > 0) {
 		// Set it to the current view
 		Mandelbrot mandel = vecStack.at(index - 1);
-		x1 = mandel.x1;
-		x2 = mandel.x2;
-		y1 = mandel.y1;
-		y2 = mandel.y2;
+		x_1 = mandel.x1;
+		x_2 = mandel.x2;
+		y_1 = mandel.y1;
+		y_2 = mandel.y2;
 		index--;
 	}
 	else {
@@ -210,7 +231,7 @@ void processLeftDown(int x, int y)
 	if (!rubberBanding)
 	{
 		int xNew = x;
-		int yNew = windowHeight - y;
+		int yNew = win_h - y;
 		xAnchor = xNew;
 		yAnchor = yNew;
 		xStretch = xNew;
@@ -234,18 +255,29 @@ void processLeftUp(int x, int y)
 		xNew = x;
 		yNew = win_h - y;
 		
-		// DO THINGS, SET THINGS BOOM. 
-		x1 = xAnchor;
-		x2 = xNew;
-		y1 = yAnchor;
-		y2 = yNew;
+		x_1 = xAnchor;
+		x_2 = xNew;
+		y_1 = yAnchor;
+		y_2 = yNew;
 
+		cout << x_1;
+		cout << "/";
+		cout << x_2;
+		cout << "/";
+		cout << y_1;
+		cout << "/";
+		cout << y_2;
+		cout << "/";
+
+
+		
 
 		// make a new mandelbrot set
-		Mandelbrot mandy(x1, x2, y1, y2);
+		Mandelbrot mandy(x_1, x_2, y_1, y_2);
 		// increase index & add malicious mandy
 		index++;
-		vecStack.push_back(i);
+		vecStack.push_back(mandy);
+		
 		// update
 		glutPostRedisplay();
 		// flush
@@ -300,13 +332,13 @@ void setMenus()
 int main(int argc, char* argv[]) 
 {
 	// get arguments
-	x1 = atof(argv[1]);
-	x2 = atof(argv[2]);
-	y1 = atof(argv[3]);
-	y2 = atof(argv[4]);
+	x_1 = atof(argv[1]);
+	x_2 = atof(argv[2]);
+	y_1 = atof(argv[3]);
+	y_2 = atof(argv[4]);
 	win_w = atoi(argv[5]);
 	win_h = atoi(argv[6]);
-	Mandelbrot init(x1, x2, y1, y2);
+	Mandelbrot init(x_1, x_2, y_1, y_2);
 	vecStack.push_back(init);
 
 	// Mask floating point exceptions.
@@ -317,7 +349,7 @@ int main(int argc, char* argv[])
 
 	// Set initial window size, position, and title.
 	glutInitWindowSize(win_w, win_h);
-	glutInitWindowPosition(inital_win_x, initial_win_y);
+	glutInitWindowPosition(INITIAL_WIN_X, INITIAL_WIN_Y);
 	glutCreateWindow("Mandelzoooom Set");
 
 	// You don't (yet) want to know what this does.
