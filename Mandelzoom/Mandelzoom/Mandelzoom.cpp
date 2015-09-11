@@ -9,6 +9,7 @@
 #include <cfloat>
 #include <vector>
 #include "Mandelbrot.h"
+#include "Color.h"
 
 using namespace std;
 
@@ -31,7 +32,9 @@ int xAnchor, yAnchor, xStretch, yStretch;
 bool rubberBanding = false;
 
 // For stack, holding all previous mandelbrots
-vector<Mandelbrot> vecStack;
+//vector<Mandelbrot> vecStack;
+vector<int[1000][1000]> iterationArrayStack;
+int currentIterationArray[1000][1000];
 int index = 0;
 
 
@@ -39,50 +42,52 @@ int index = 0;
 
 void drawPixel(int u, int v, int i) {
 	// Go Find the Color --> Colors a point depending on how close (or even if it is)
-	// it is to being in the Mandelbrot set. 
-	float r;
-	float g;
-	float b;
+	// it is to being in the Mandelbrot set.
+	Color c(0,0,0);
 
 	if (0 < i && i < 10) {
 		//red;
-		r = 1.0;
-		g = 0.0;
-		b = 0.0;
+		c.r = 1.0;
+		c.g = 0.0;
+		c.b = 0.0;
 	}
 	else if (10 < i && i < 350) {
 		//green;
-		r = 0.0;
-		g = 1.0;
-		b = 0.0;
+		c.r = 0.0;
+		c.g = 1.0;
+		c.b = 0.0;
 	}
 	else if (i < 350 && i < 450) {
 		//blue;
-		r = 0.0;
-		g = 0.0;
-		b = 1.0;
+		c.r = 0.0;
+		c.g = 0.0;
+		c.b = 1.0;
 	}
 	else if (i < 450 && i < MAX) {
 		//pink
-		r = 0.9;
-		g = 0.9;
-		b = 0.9;
+		c.r = 0.9;
+		c.g = 0.9;
+		c.b = 0.9;
 	}
 	else if (i == MAX) {
 		//black;
-		r = 0.0;
-		g = 0.0;
-		b = 0.0;
+		c.r = 0.0;
+		c.g = 0.0;
+		c.b = 0.0;
 	}
 	else {
 		//white;
-		r = 1.0;
-		g = 1.0;
-		b = 1.0;
+		c.r = 1.0;
+		c.g = 1.0;
+		c.b = 1.0;
 	}
 
 	// Set the Color -->
-	glColor3f(r, g, b);
+	glColor3f(c.r, c.g, c.b);
+
+	// Save the iteration val -->
+	currentIterationArray[u][v] = i;
+
 	// Plot point
 	glVertex2i(u, v);
 	
@@ -150,9 +155,11 @@ void drawRubberBand(int xA, int yA, int xS, int yS)
 {
 	glEnable(GL_COLOR_LOGIC_OP);
 	glLogicOp(GL_XOR);
-	glBegin(GL_LINES);
+	glBegin(GL_LINE_LOOP);
 	glVertex2i(xA, yA);
+	glVertex2i(xA, yS);
 	glVertex2i(xS, yS);
+	glVertex2i(xS, yA);
 	glEnd();
 	glDisable(GL_COLOR_LOGIC_OP);
 	glFlush();
@@ -175,42 +182,46 @@ void rubberBand(int x, int y)
 
 // zooming in --> pushes mandelbrot onto the stack
 void Push() {
-	// index > 0
-	//if (index > 0) {
-		// set mandel's stuff to be our stuff so that we have a saved mandelbrot
-		// computation
-	//	Mandelbrot mandel = vecStack.at(index++);
-	//	mandel.x1 = x1;
-	//	mandel.x2 = x2;
-	//	mandel.y1 = y1;
-	//	mandel.y2 = y2;
-	//}
-	//else {
-		// index at 0
-		// pushing it onto the stack
-		Mandelbrot mandy(x_1, x_2, y_1, y_2);
-		vecStack.push_back(mandy);
+	//	Mandelbrot mandy(x_1, x_2, y_1, y_2);
+	//	vecStack.push_back(mandy);
+	//	index++;
+	// 	glutPostRedisplay();
+
+		// NEW
+		iterationArrayStack.push_back(currentIterationArray);
 		index++;
-//	} 
-	glutPostRedisplay();
+		glBegin(GL_POINTS);
+		for each (int u in currentIterationArray) {
+			for each(int v in currentIterationArray) {
+				drawPixel(u, v, currentIterationArray[u,v]);
+			}
+		}
+		glEnd();
+		glFlush();
+
 }
 
 // pops mandelbrot off of the vector stack
 void Pop() {
 	// zoom out
 	if (index > 0) {
+		//previous:
 		// Set it to the current view
-		Mandelbrot mandel = vecStack.at(index - 1);
-		x_1 = mandel.x1;
-		x_2 = mandel.x2;
-		y_1 = mandel.y1;
-		y_2 = mandel.y2;
+		//Mandelbrot mandel = vecStack.at(index - 1);
+		//x_1 = mandel.x1;
+		//x_2 = mandel.x2;
+		//y_1 = mandel.y1;
+		//y_2 = mandel.y2;
+		//index--;
+		//glutPostRedisplay();
+		
+		// new
+		currentIterationArray = iterationArrayStack.at(index - 1);
 		index--;
 	}
 	else {
 		return; // when there's nothing is there to pop off
 	}
-	glutPostRedisplay();
 }
 
 
@@ -250,15 +261,99 @@ void processLeftUp(int x, int y)
 	{
 		// Setting up
 		int xNew, yNew;
+		// draw the rubber band
 		drawRubberBand(xAnchor, yAnchor, xStretch, yStretch);
 		rubberBanding = false;
+		// converting coordinates that are upside down
 		xNew = x;
 		yNew = win_h - y;
-		
-		x_1 = xAnchor;
-		x_2 = xNew;
-		y_1 = yAnchor;
-		y_2 = yNew;
+
+		double xMin;
+		double xMax;
+		double yMin;
+		double yMax;
+
+		if (xAnchor < xNew) {
+			xMin = xAnchor;
+			xMax = xNew;
+		}
+		else {
+			xMin = xNew;
+			xMax = xAnchor;
+		}
+
+		if (yAnchor < yNew) {
+			yMin = yAnchor;
+			yMax = yNew;
+		}
+		else {
+			yMin = yNew;
+			yMax = yAnchor;
+		}
+
+
+		//double xMin = (xAnchor<xNew) ? xAnchor : xNew;
+		//double xMax = (xAnchor<xNew) ? xAnchor : xNew;
+
+	//	double yMin = (yAnchor<yNew) ? yAnchor : yNew;
+		//double yMax = (yAnchor>yNew) ? yAnchor : yNew;
+
+		// anchor = min; new = max
+		xAnchor = xMin;
+		yAnchor = yMin;
+		xNew = xMax;
+		yNew = yMax;
+
+		// Going from the point (xAnchor, yAnchor) to Complex Plane!
+		double anchorXReal = getSReal(xAnchor);
+		double anchorYImaginary = getSImaginary(yAnchor);
+
+		// Going from the point (xNew, yNew) to Complex Plane!
+		double newXReal = getSReal(xNew);
+		double newYImaginary = getSImaginary(yNew);
+
+		// Across X of Rubberband Rectangle:
+		double xDistance = newXReal - anchorXReal;
+
+		// Across Y of Rectangle:
+		double yDistance = newYImaginary - anchorYImaginary;
+
+		// Ar = Aspect Ratio of the Rectangle:
+		double Ar = yDistance / xDistance;
+
+		// Getting the size of the window-->
+		double xS = x_2 - x_1;
+		double yS = y_2 - y_1;
+
+		// Aw = Aspect Ratio of the Window:
+		double Aw =  yS/xS;
+
+		// If the Aspect Ratio of the Rect & Window are the same,
+		// then no adjustments needed!
+		if (Ar == Aw) {
+			x_1 = anchorXReal;
+			x_2 = newXReal;
+			y_1 = anchorYImaginary;
+			y_2 = newYImaginary;
+		}
+		else if (Ar > Aw) {
+			// If the Rect Aspect Ratio is bigger than the Window Aspect Ratio,
+			// xd needs to be bigger, by making x1 smaller and x2 larger
+			double c = (((Ar / Aw) - 1 / 2)) * xDistance;
+			x_1 = anchorXReal - c;
+			x_2 = newXReal + c;
+			y_1 = anchorYImaginary;
+			y_2 = newYImaginary;
+		}
+		else {
+			// The aspect ratio of the Window is bigger than the Rect Aspect Ratio, 
+			// so we need to make yd bigger, by making y1 smaller and y2 larger
+			double c = (((Ar / Aw) - 1 / 2)) * yDistance;
+			x_1 = anchorXReal;
+			x_2 = newXReal;
+			y_1 = anchorYImaginary - c;
+			y_2 = newYImaginary + c;
+		}
 
 		cout << x_1;
 		cout << "/";
@@ -269,18 +364,28 @@ void processLeftUp(int x, int y)
 		cout << y_2;
 		cout << "/";
 
-
-		
+		// PREVIOUS:
 
 		// make a new mandelbrot set
-		Mandelbrot mandy(x_1, x_2, y_1, y_2);
+		//Mandelbrot mandy(x_1, x_2, y_1, y_2);
 		// increase index & add malicious mandy
-		index++;
-		vecStack.push_back(mandy);
-		
+		//index++;
+		//vecStack.push_back(mandy);
 		// update
-		glutPostRedisplay();
+		//glutPostRedisplay();
 		// flush
+
+		// NEW
+
+		index++;
+		iterationArrayStack.push_back(currentIterationArray);
+		glBegin(GL_POINTS);
+		for each (int u in currentIterationArray) {
+			for each(int v in currentIterationArray) {
+				drawPixel(u, v, currentIterationArray[u, v]);
+			}
+		}
+		glEnd();
 		glFlush();
 	}
 }
@@ -338,8 +443,9 @@ int main(int argc, char* argv[])
 	y_2 = atof(argv[4]);
 	win_w = atoi(argv[5]);
 	win_h = atoi(argv[6]);
-	Mandelbrot init(x_1, x_2, y_1, y_2);
-	vecStack.push_back(init);
+	// PREVIOUS
+	//Mandelbrot init(x_1, x_2, y_1, y_2);
+	//vecStack.push_back(init);
 
 	// Mask floating point exceptions.
 	_control87(MCW_EM, MCW_EM);
