@@ -2,6 +2,7 @@
 // COMPUTER GRAPHICS!
 // Kathryn Hodge
 // ------------------- MANDELZOOM --------------
+// Favorite Picture @ (mandelzoom -1.921, -1.012, -0.465, 0.447, 400, 400)
 
 #include <iostream>
 #include <cstdlib>
@@ -32,9 +33,7 @@ int xAnchor, yAnchor, xStretch, yStretch;
 bool rubberBanding = false;
 
 // For stack, holding all previous mandelbrots
-//vector<Mandelbrot> vecStack;
-vector<int[1000][1000]> iterationArrayStack;
-int currentIterationArray[1000][1000];
+vector<Mandelbrot> vecStack;
 int index = 0;
 
 
@@ -46,34 +45,37 @@ void drawPixel(int u, int v, int i) {
 	Color c(0,0,0);
 
 	if (0 < i && i < 10) {
-		//red;
+		// black;
+		c.r = 0.0;
+		c.g = 0.0;
+		c.b = 0.0;
+	}
+	else if (10 < i && i < 30) {
+		//green
+		c.r = 0;
+		c.g = 0.0;
+		c.b = 1.0;;
+	}
+	else if (i < 30 && i < 400) {
+		//purple;
 		c.r = 1.0;
 		c.g = 0.0;
-		c.b = 0.0;
+		c.b = 1.0;
+		c.r = .53;
+		c.g = .12;
+		c.b = .47;
 	}
-	else if (10 < i && i < 350) {
-		//green;
-		c.r = 0.0;
+	else if (i < 400 && i < MAX) {
+		//pink
+		c.r = 1.0;
 		c.g = 1.0;
-		c.b = 0.0;
-	}
-	else if (i < 350 && i < 450) {
-		//blue;
-		c.r = 0.0;
-		c.g = 0.0;
 		c.b = 1.0;
 	}
-	else if (i < 450 && i < MAX) {
-		//pink
-		c.r = 0.9;
-		c.g = 0.9;
-		c.b = 0.9;
-	}
 	else if (i == MAX) {
-		//black;
-		c.r = 0.0;
-		c.g = 0.0;
-		c.b = 0.0;
+		//pink;
+		c.r = 1.0;
+		c.g = .11;
+		c.b = .68;
 	}
 	else {
 		//white;
@@ -84,9 +86,6 @@ void drawPixel(int u, int v, int i) {
 
 	// Set the Color -->
 	glColor3f(c.r, c.g, c.b);
-
-	// Save the iteration val -->
-	currentIterationArray[u][v] = i;
 
 	// Plot point
 	glVertex2i(u, v);
@@ -182,23 +181,19 @@ void rubberBand(int x, int y)
 
 // zooming in --> pushes mandelbrot onto the stack
 void Push() {
-	//	Mandelbrot mandy(x_1, x_2, y_1, y_2);
-	//	vecStack.push_back(mandy);
-	//	index++;
-	// 	glutPostRedisplay();
+	// push the current mandelbrot onto the stack
+	Mandelbrot mandy(x_1, x_2, y_1, y_2);
+	vecStack.push_back(mandy);
+	index++;
 
-		// NEW
-		iterationArrayStack.push_back(currentIterationArray);
-		index++;
-		glBegin(GL_POINTS);
-		for each (int u in currentIterationArray) {
-			for each(int v in currentIterationArray) {
-				drawPixel(u, v, currentIterationArray[u,v]);
-			}
-		}
-		glEnd();
-		glFlush();
-
+	// show a previously defined smaller region of the complex plane
+		x_1 = -0.27;
+		x_2 = 0.022;
+		y_1 = -0.926;
+		y_2 = -0.635;
+	
+	glutPostRedisplay();
+	glFlush();
 }
 
 // pops mandelbrot off of the vector stack
@@ -207,21 +202,22 @@ void Pop() {
 	if (index > 0) {
 		//previous:
 		// Set it to the current view
-		//Mandelbrot mandel = vecStack.at(index - 1);
-		//x_1 = mandel.x1;
-		//x_2 = mandel.x2;
-		//y_1 = mandel.y1;
-		//y_2 = mandel.y2;
-		//index--;
-		//glutPostRedisplay();
-		
-		// new
-		currentIterationArray = iterationArrayStack.at(index - 1);
+		Mandelbrot mandel = vecStack.at(index - 1);
+		x_1 = mandel.x1;
+		x_2 = mandel.x2;
+		y_1 = mandel.y1;
+		y_2 = mandel.y2;
 		index--;
 	}
 	else {
-		return; // when there's nothing is there to pop off
+		// when there's nothing is there to pop off, go to a default wide view
+			x_1 = -2.0;
+			x_2 = 0.5;
+			y_1 = -1.25;
+			y_2 = 1.25;
 	}
+	glutPostRedisplay();
+	glFlush();
 }
 
 
@@ -268,55 +264,27 @@ void processLeftUp(int x, int y)
 		xNew = x;
 		yNew = win_h - y;
 
-		double xMin;
-		double xMax;
-		double yMin;
-		double yMax;
+		// Setting up new min and max
+		double xMin = (xAnchor<xNew) ? xAnchor : xNew;
+		double xMax = (xAnchor>xNew) ? xAnchor : xNew;
 
-		if (xAnchor < xNew) {
-			xMin = xAnchor;
-			xMax = xNew;
-		}
-		else {
-			xMin = xNew;
-			xMax = xAnchor;
-		}
-
-		if (yAnchor < yNew) {
-			yMin = yAnchor;
-			yMax = yNew;
-		}
-		else {
-			yMin = yNew;
-			yMax = yAnchor;
-		}
+		double yMin = (yAnchor<yNew) ? yAnchor : yNew;
+		double yMax = (yAnchor>yNew) ? yAnchor : yNew;
 
 
-		//double xMin = (xAnchor<xNew) ? xAnchor : xNew;
-		//double xMax = (xAnchor<xNew) ? xAnchor : xNew;
+		// Going from the point (xMin, yMin) to Complex Plane!
+		double xMinReal = getSReal(xMin);
+		double yMinImaginary = getSImaginary(yMin);
 
-	//	double yMin = (yAnchor<yNew) ? yAnchor : yNew;
-		//double yMax = (yAnchor>yNew) ? yAnchor : yNew;
-
-		// anchor = min; new = max
-		xAnchor = xMin;
-		yAnchor = yMin;
-		xNew = xMax;
-		yNew = yMax;
-
-		// Going from the point (xAnchor, yAnchor) to Complex Plane!
-		double anchorXReal = getSReal(xAnchor);
-		double anchorYImaginary = getSImaginary(yAnchor);
-
-		// Going from the point (xNew, yNew) to Complex Plane!
-		double newXReal = getSReal(xNew);
-		double newYImaginary = getSImaginary(yNew);
+		// Going from the point (xMax, yMax) to Complex Plane!
+		double xMaxReal = getSReal(xMax);
+		double yMaxImaginary = getSImaginary(yMax);
 
 		// Across X of Rubberband Rectangle:
-		double xDistance = newXReal - anchorXReal;
+		double xDistance = xMaxReal - xMinReal;
 
 		// Across Y of Rectangle:
-		double yDistance = newYImaginary - anchorYImaginary;
+		double yDistance = yMaxImaginary - yMinImaginary;
 
 		// Ar = Aspect Ratio of the Rectangle:
 		double Ar = yDistance / xDistance;
@@ -331,61 +299,61 @@ void processLeftUp(int x, int y)
 		// If the Aspect Ratio of the Rect & Window are the same,
 		// then no adjustments needed!
 		if (Ar == Aw) {
-			x_1 = anchorXReal;
-			x_2 = newXReal;
-			y_1 = anchorYImaginary;
-			y_2 = newYImaginary;
+			x_1 = xMinReal;
+			x_2 = xMaxReal;
+			y_1 = yMinImaginary;
+			y_2 = yMaxImaginary;
 		}
 		else if (Ar > Aw) {
-			// If the Rect Aspect Ratio is bigger than the Window Aspect Ratio,
-			// xd needs to be bigger, by making x1 smaller and x2 larger
-			double c = (((Ar / Aw) - 1 / 2)) * xDistance;
-			x_1 = anchorXReal - c;
-			x_2 = newXReal + c;
-			y_1 = anchorYImaginary;
-			y_2 = newYImaginary;
+			// We need to give the new window a greater width xDistance so that:
+			// Aw = (yMaxImaginary - yMinImaginary) / xDistNew; --> creating a new ratio
+			double xDistNew = (yMaxImaginary - yMinImaginary)/Aw;
+			// We also want the horizontal midpoint of the new region to be the same as in the old region.
+			double xMidPoint = (xMinReal + xMaxReal) / 2;
+			// Now we set x_1 and x_2 so that they are separated by xDistNew and centered on xMidPoint :
+			x_1 = xMidPoint - xDistNew / 2;
+			x_2 = xMidPoint + xDistNew / 2;
+			y_1 = yMinImaginary;
+			y_2 = yMaxImaginary;
 		}
 		else {
-			// The aspect ratio of the Window is bigger than the Rect Aspect Ratio, 
-			// so we need to make yd bigger, by making y1 smaller and y2 larger
-			double c = (((Ar / Aw) - 1 / 2)) * yDistance;
-			x_1 = anchorXReal;
-			x_2 = newXReal;
-			y_1 = anchorYImaginary - c;
-			y_2 = newYImaginary + c;
+			// We need to give the new window a greater height yDistance so that: Aw = (x_2-x_1) / yDistNew
+			double yDistNew = (xMaxReal - xMinReal) / Aw;
+			// We also want the horizontal midpoint of the new region to be the same as in the old region.
+			double yMidPoint = (yMinImaginary + yMaxImaginary) / 2;
+			// Now we set x_1 and x_2 so that they are separated by xDistNew and centered on xMidPoint :
+			x_1 = xMinReal;
+			x_2 = xMaxReal;
+			y_1 = yMidPoint - yDistNew / 2;
+			y_2 = yMidPoint + yDistNew / 2;
 		}
 
+		cout << "x_1:";
 		cout << x_1;
 		cout << "/";
+		cout << "x_2:";
 		cout << x_2;
 		cout << "/";
+		cout << "y_1:";
 		cout << y_1;
 		cout << "/";
+		cout << "y_2:";
 		cout << y_2;
 		cout << "/";
-
-		// PREVIOUS:
+		cout << "win_w:";
+		cout << win_w;
+		cout << "/";
+		cout << "win_h:";
+		cout << win_h;
 
 		// make a new mandelbrot set
-		//Mandelbrot mandy(x_1, x_2, y_1, y_2);
+		Mandelbrot mandy(x_1, x_2, y_1, y_2);
 		// increase index & add malicious mandy
-		//index++;
-		//vecStack.push_back(mandy);
-		// update
-		//glutPostRedisplay();
-		// flush
-
-		// NEW
-
 		index++;
-		iterationArrayStack.push_back(currentIterationArray);
-		glBegin(GL_POINTS);
-		for each (int u in currentIterationArray) {
-			for each(int v in currentIterationArray) {
-				drawPixel(u, v, currentIterationArray[u, v]);
-			}
-		}
-		glEnd();
+		vecStack.push_back(mandy);
+		// update
+		glutPostRedisplay();
+		// flush
 		glFlush();
 	}
 }
@@ -444,8 +412,8 @@ int main(int argc, char* argv[])
 	win_w = atoi(argv[5]);
 	win_h = atoi(argv[6]);
 	// PREVIOUS
-	//Mandelbrot init(x_1, x_2, y_1, y_2);
-	//vecStack.push_back(init);
+	Mandelbrot init(x_1, x_2, y_1, y_2);
+	vecStack.push_back(init);
 
 	// Mask floating point exceptions.
 	_control87(MCW_EM, MCW_EM);
