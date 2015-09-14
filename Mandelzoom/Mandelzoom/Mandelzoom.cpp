@@ -33,8 +33,10 @@ int xAnchor, yAnchor, xStretch, yStretch;
 bool rubberBanding = false;
 
 // For stack, holding all previous mandelbrots
-vector<Mandelbrot> vecStack;
-int index = 0;
+vector<Mandelbrot> currentViewStack;
+vector<Mandelbrot> savedPreviouslyViewedStack;
+int currentViewStackIndex = -1;
+int savedPreviouslyViewedStackIndex = -1;
 
 
 // DRAW PIXEL:
@@ -180,47 +182,60 @@ void rubberBand(int x, int y)
 }
 
 // zooming in --> pushes mandelbrot onto the stack
+// push --> 
+// 1. take top from the savedPreviouslyViewStack
+// 2. put it on the currentViewStack
+// 3. display new top of the currentViewStack
 void Push() {
-	// push the current mandelbrot onto the stack
-	Mandelbrot mandy(x_1, x_2, y_1, y_2);
-	vecStack.push_back(mandy);
-	index++;
-
-	// show a previously defined smaller region of the complex plane
-		x_1 = -0.27;
-		x_2 = 0.022;
-		y_1 = -0.926;
-		y_2 = -0.635;
-	
-	glutPostRedisplay();
-	glFlush();
-}
-
-// pops mandelbrot off of the vector stack
-void Pop() {
-	// zoom out
-	if (index > 0) {
-		//previous:
-		// Set it to the current view
-		Mandelbrot mandel = vecStack.at(index - 1);
-		x_1 = mandel.x1;
-		x_2 = mandel.x2;
-		y_1 = mandel.y1;
-		y_2 = mandel.y2;
-		index--;
+	if (savedPreviouslyViewedStackIndex >= 0) {
+		//  1. take top from the savedPreviouslyViewStack
+		Mandelbrot newTopOfCurrentViewStack = savedPreviouslyViewedStack.at(savedPreviouslyViewedStackIndex);
+		savedPreviouslyViewedStackIndex--;
+		// 2. put it on the currentViewStack
+		currentViewStack.push_back(newTopOfCurrentViewStack);
+		currentViewStackIndex++;
+		// 3. display new top of the currentViewStack
+		x_1 = newTopOfCurrentViewStack.x1;
+		x_2 = newTopOfCurrentViewStack.x2;
+		y_1 = newTopOfCurrentViewStack.y1;
+		y_2 = newTopOfCurrentViewStack.y2;
+		glutPostRedisplay();
+		glFlush();
 	}
 	else {
-		// when there's nothing is there to pop off, go to a default wide view
-			x_1 = -2.0;
-			x_2 = 0.5;
-			y_1 = -1.25;
-			y_2 = 1.25;
+		return; // nothing to show from the previously saved so just return
+	}
+
+	
+}
+
+// pop --> 
+// 1. take the top from the currentViewStack
+// 2. put it on the top of the savedPreviouslyViewedStack
+// 3. display the new top of the currentViewStack
+void Pop() {
+	// zoom out
+	if (currentViewStackIndex > 0) {
+		// take the top from the currentViewStack
+		Mandelbrot currentMandel = currentViewStack.at(currentViewStackIndex);
+		currentViewStackIndex--;
+		// put it on the top of the savedPreviouslyViewedStack
+		savedPreviouslyViewedStack.push_back(currentMandel);
+		savedPreviouslyViewedStackIndex++;
+		// display the new top of the currentViewStack
+		Mandelbrot newTopMandel = currentViewStack.at(currentViewStackIndex);
+		x_1 = newTopMandel.x1;
+		x_2 = newTopMandel.x2;
+		y_1 = newTopMandel.y1;
+		y_2 = newTopMandel.y2;
+	}
+	else {
+		// when there's nothing is there to pop off, just return
+		return;
 	}
 	glutPostRedisplay();
 	glFlush();
 }
-
-
 
 void reshape(int w, int h)
 // Callback for processing reshape events.
@@ -346,12 +361,21 @@ void processLeftUp(int x, int y)
 		cout << "win_h:";
 		cout << win_h;
 
-		// make a new mandelbrot set
+		// When we redraw with rubberband --> 
+		// 1. Add new mandelbrot set to the currentViewStack
+		// 2. Clear the previouslySavedStack
+		// 3. Display top of the currentViewStack 
+
+		// 1. Add new mandelbrot set to the currentViewStack
 		Mandelbrot mandy(x_1, x_2, y_1, y_2);
-		// increase index & add malicious mandy
-		index++;
-		vecStack.push_back(mandy);
-		// update
+		currentViewStack.push_back(mandy);
+		currentViewStackIndex++;
+
+		// 2. Clear the previouslySavedStack
+		savedPreviouslyViewedStack.clear();
+		savedPreviouslyViewedStackIndex = -1;
+
+		// 3. Display mandy
 		glutPostRedisplay();
 		// flush
 		glFlush();
@@ -413,7 +437,8 @@ int main(int argc, char* argv[])
 	win_h = atoi(argv[6]);
 	// PREVIOUS
 	Mandelbrot init(x_1, x_2, y_1, y_2);
-	vecStack.push_back(init);
+	currentViewStack.push_back(init);
+	currentViewStackIndex++;
 
 	// Mask floating point exceptions.
 	_control87(MCW_EM, MCW_EM);
